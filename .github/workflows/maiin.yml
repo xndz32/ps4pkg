@@ -1,0 +1,24 @@
+name: Build PS4 PKG
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compilar o jogo
+        run: |
+          unzip -q -o ./*.zip
+          cd "$(dirname "$(dirname "$(find . -path '*/ci/build.sh' | head -n 1)")")"
+          bash ci/build.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: resultado
+          path: "**/*.pkg"
